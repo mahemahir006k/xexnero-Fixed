@@ -1,0 +1,1485 @@
+{
+  "nodes": [
+    {
+      "id": "seqAgent_2",
+      "position": {
+        "x": -298.05028919904106,
+        "y": -66.87923573284138
+      },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_2",
+        "label": "Content Creator",
+        "version": 4.1,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": [
+          "Agent"
+        ],
+        "category": "Sequential Agents",
+        "description": "Agent that can execute tools",
+        "inputParams": [
+          {
+            "label": "Agent Name",
+            "name": "agentName",
+            "type": "string",
+            "placeholder": "Agent",
+            "id": "seqAgent_2-input-agentName-string",
+            "display": true
+          },
+          {
+            "label": "System Prompt",
+            "name": "systemMessagePrompt",
+            "type": "string",
+            "rows": 4,
+            "optional": true,
+            "default": "You are a research assistant who can search for up-to-date info using search engine.",
+            "id": "seqAgent_2-input-systemMessagePrompt-string",
+            "display": true
+          },
+          {
+            "label": "Prepend Messages History",
+            "name": "messageHistory",
+            "description": "Prepend a list of messages between System Prompt and Human Prompt. This is useful when you want to provide few shot examples",
+            "type": "code",
+            "hideCodeExecute": true,
+            "codeExample": "const { AIMessage, HumanMessage, ToolMessage } = require('@langchain/core/messages');\n\nreturn [\n    new HumanMessage(\"What is 333382 🦜 1932?\"),\n    new AIMessage({\n        content: \"\",\n        tool_calls: [\n        {\n            id: \"12345\",\n            name: \"calulator\",\n            args: {\n                number1: 333382,\n                number2: 1932,\n                operation: \"divide\",\n            },\n        },\n        ],\n    }),\n    new ToolMessage({\n        tool_call_id: \"12345\",\n        content: \"The answer is 172.558.\",\n    }),\n    new AIMessage(\"The answer is 172.558.\"),\n]",
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_2-input-messageHistory-code",
+            "display": true
+          },
+          {
+            "label": "Conversation History",
+            "name": "conversationHistorySelection",
+            "type": "options",
+            "options": [
+              {
+                "label": "User Question",
+                "name": "user_question",
+                "description": "Use the user question from the historical conversation messages as input."
+              },
+              {
+                "label": "Last Conversation Message",
+                "name": "last_message",
+                "description": "Use the last conversation message from the historical conversation messages as input."
+              },
+              {
+                "label": "All Conversation Messages",
+                "name": "all_messages",
+                "description": "Use all conversation messages from the historical conversation messages as input."
+              },
+              {
+                "label": "Empty",
+                "name": "empty",
+                "description": "Do not use any messages from the conversation history. Ensure to use either System Prompt, Human Prompt, or Messages History."
+              }
+            ],
+            "default": "all_messages",
+            "optional": true,
+            "description": "Select which messages from the conversation history to include in the prompt. The selected messages will be inserted between the System Prompt (if defined) and [Messages History, Human Prompt].",
+            "additionalParams": true,
+            "id": "seqAgent_2-input-conversationHistorySelection-options",
+            "display": true
+          },
+          {
+            "label": "Human Prompt",
+            "name": "humanMessagePrompt",
+            "type": "string",
+            "description": "This prompt will be added at the end of the messages as human message",
+            "rows": 4,
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_2-input-humanMessagePrompt-string",
+            "display": true
+          },
+          {
+            "label": "Require Approval",
+            "name": "interrupt",
+            "description": "Pause execution and request user approval before running tools.\nIf enabled, the agent will prompt the user with customizable approve/reject options\nand will proceed only after approval. This requires a configured agent memory to manage\nthe state and handle approval requests.\nIf no tools are invoked, the agent proceeds without interruption.",
+            "type": "boolean",
+            "optional": true,
+            "id": "seqAgent_2-input-interrupt-boolean",
+            "display": true
+          },
+          {
+            "label": "Format Prompt Values",
+            "name": "promptValues",
+            "description": "Assign values to the prompt variables. You can also use $flow.state.<variable-name> to get the state value",
+            "type": "json",
+            "optional": true,
+            "acceptVariable": true,
+            "list": true,
+            "id": "seqAgent_2-input-promptValues-json",
+            "display": true
+          },
+          {
+            "label": "Approval Prompt",
+            "name": "approvalPrompt",
+            "description": "Prompt for approval. Only applicable if \"Require Approval\" is enabled",
+            "type": "string",
+            "default": "You are about to execute tool: {tools}. Ask if user want to proceed",
+            "rows": 4,
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_2-input-approvalPrompt-string",
+            "display": true
+          },
+          {
+            "label": "Approve Button Text",
+            "name": "approveButtonText",
+            "description": "Text for approve button. Only applicable if \"Require Approval\" is enabled",
+            "type": "string",
+            "default": "Yes",
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_2-input-approveButtonText-string",
+            "display": true
+          },
+          {
+            "label": "Reject Button Text",
+            "name": "rejectButtonText",
+            "description": "Text for reject button. Only applicable if \"Require Approval\" is enabled",
+            "type": "string",
+            "default": "No",
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_2-input-rejectButtonText-string",
+            "display": true
+          },
+          {
+            "label": "Update State",
+            "name": "updateStateMemory",
+            "type": "tabs",
+            "tabIdentifier": "selectedUpdateStateMemoryTab",
+            "additionalParams": true,
+            "default": "updateStateMemoryUI",
+            "tabs": [
+              {
+                "label": "Update State (Table)",
+                "name": "updateStateMemoryUI",
+                "type": "datagrid",
+                "hint": {
+                  "label": "How to use",
+                  "value": "\n1. Key and value pair to be updated. For example: if you have the following State:\n    | Key       | Operation     | Default Value     |\n    |-----------|---------------|-------------------|\n    | user      | Replace       |                   |\n\n    You can update the \"user\" value with the following:\n    | Key       | Value     |\n    |-----------|-----------|\n    | user      | john doe  |\n\n2. If you want to use the Agent's output as the value to update state, it is available as available as `$flow.output` with the following structure:\n    ```json\n    {\n        \"content\": \"Hello! How can I assist you today?\",\n        \"usedTools\": [\n            {\n                \"tool\": \"tool-name\",\n                \"toolInput\": \"{foo: var}\",\n                \"toolOutput\": \"This is the tool's output\"\n            }\n        ],\n        \"sourceDocuments\": [\n            {\n                \"pageContent\": \"This is the page content\",\n                \"metadata\": \"{foo: var}\"\n            }\n        ]\n    }\n    ```\n\n    For example, if the `toolOutput` is the value you want to update the state with, you can do the following:\n    | Key       | Value                                     |\n    |-----------|-------------------------------------------|\n    | user      | `$flow.output.usedTools[0].toolOutput`  |\n\n3. You can get default flow config, including the current \"state\":\n    - `$flow.sessionId`\n    - `$flow.chatId`\n    - `$flow.chatflowId`\n    - `$flow.input`\n    - `$flow.state`\n\n4. You can get custom variables: `$vars.<variable-name>`\n\n"
+                },
+                "description": "This is only applicable when you have a custom State at the START node. After agent execution, you might want to update the State values",
+                "datagrid": [
+                  {
+                    "field": "key",
+                    "headerName": "Key",
+                    "type": "asyncSingleSelect",
+                    "loadMethod": "loadStateKeys",
+                    "flex": 0.5,
+                    "editable": true
+                  },
+                  {
+                    "field": "value",
+                    "headerName": "Value",
+                    "type": "freeSolo",
+                    "valueOptions": [
+                      {
+                        "label": "Agent Output (string)",
+                        "value": "$flow.output.content"
+                      },
+                      {
+                        "label": "Used Tools (array)",
+                        "value": "$flow.output.usedTools"
+                      },
+                      {
+                        "label": "First Tool Output (string)",
+                        "value": "$flow.output.usedTools[0].toolOutput"
+                      },
+                      {
+                        "label": "Source Documents (array)",
+                        "value": "$flow.output.sourceDocuments"
+                      },
+                      {
+                        "label": "Global variable (string)",
+                        "value": "$vars.<variable-name>"
+                      },
+                      {
+                        "label": "Input Question (string)",
+                        "value": "$flow.input"
+                      },
+                      {
+                        "label": "Session Id (string)",
+                        "value": "$flow.sessionId"
+                      },
+                      {
+                        "label": "Chat Id (string)",
+                        "value": "$flow.chatId"
+                      },
+                      {
+                        "label": "Chatflow Id (string)",
+                        "value": "$flow.chatflowId"
+                      }
+                    ],
+                    "editable": true,
+                    "flex": 1
+                  }
+                ],
+                "optional": true,
+                "additionalParams": true
+              },
+              {
+                "label": "Update State (Code)",
+                "name": "updateStateMemoryCode",
+                "type": "code",
+                "hint": {
+                  "label": "How to use",
+                  "value": "\n1. Return the key value JSON object. For example: if you have the following State:\n    ```json\n    {\n        \"user\": null\n    }\n    ```\n\n    You can update the \"user\" value by returning the following:\n    ```js\n    return {\n        \"user\": \"john doe\"\n    }\n    ```\n\n2. If you want to use the agent's output as the value to update state, it is available as `$flow.output` with the following structure:\n    ```json\n    {\n        \"content\": \"Hello! How can I assist you today?\",\n        \"usedTools\": [\n            {\n                \"tool\": \"tool-name\",\n                \"toolInput\": \"{foo: var}\",\n                \"toolOutput\": \"This is the tool's output\"\n            }\n        ],\n        \"sourceDocuments\": [\n            {\n                \"pageContent\": \"This is the page content\",\n                \"metadata\": \"{foo: var}\"\n            }\n        ]\n    }\n    ```\n\n    For example, if the `toolOutput` is the value you want to update the state with, you can return the following:\n    ```js\n    return {\n        \"user\": $flow.output.usedTools[0].toolOutput\n    }\n    ```\n\n3. You can also get default flow config, including the current \"state\":\n    - `$flow.sessionId`\n    - `$flow.chatId`\n    - `$flow.chatflowId`\n    - `$flow.input`\n    - `$flow.state`\n\n4. You can get custom variables: `$vars.<variable-name>`\n\n"
+                },
+                "description": "This is only applicable when you have a custom State at the START node. After agent execution, you might want to update the State values. Must return an object representing the state",
+                "hideCodeExecute": true,
+                "codeExample": "const result = $flow.output;\n\n/* Suppose we have a custom State schema like this:\n* {\n    aggregate: {\n        value: (x, y) => x.concat(y),\n        default: () => []\n    }\n  }\n*/\n\nreturn {\n  aggregate: [result.content]\n};",
+                "optional": true,
+                "additionalParams": true
+              }
+            ],
+            "id": "seqAgent_2-input-updateStateMemory-tabs",
+            "display": true
+          },
+          {
+            "label": "Max Iterations",
+            "name": "maxIterations",
+            "type": "number",
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_2-input-maxIterations-number",
+            "display": true
+          }
+        ],
+        "inputAnchors": [
+          {
+            "label": "Tools",
+            "name": "tools",
+            "type": "Tool",
+            "list": true,
+            "optional": true,
+            "id": "seqAgent_2-input-tools-Tool",
+            "display": true
+          },
+          {
+            "label": "Sequential Node",
+            "name": "sequentialNode",
+            "type": "Start | Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+            "description": "Can be connected to one of the following nodes: Start, Agent, Condition, LLM Node, Tool Node, Custom Function, Execute Flow",
+            "list": true,
+            "id": "seqAgent_2-input-sequentialNode-Start | Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+            "display": true
+          },
+          {
+            "label": "Chat Model",
+            "name": "model",
+            "type": "BaseChatModel",
+            "optional": true,
+            "description": "Overwrite model to be used for this agent",
+            "id": "seqAgent_2-input-model-BaseChatModel",
+            "display": true
+          }
+        ],
+        "inputs": {
+          "agentName": "ContentCreator",
+          "systemMessagePrompt": "You are Xexnaro's official AI Social Media Content Creator.\n\nYour job is to create one professional Facebook post for Xexnaro.\n\nYou have exactly TWO tools:\n\n1. company_text\n2. next_topic\n\n============================================================\nMANDATORY TOOL WORKFLOW\n============================================================\n\nYou MUST follow this exact order:\n\nSTEP 1:\nCall company_text exactly once.\n\nSTEP 2:\nCall next_topic exactly once.\n\nSTEP 3:\nRead both tool responses.\n\nSTEP 4:\nUse the topic returned by next_topic as the ONLY topic for this post.\n\nDo not choose your own topic.\n\nDo not replace the topic.\n\nDo not generate content before receiving the topic.\n\n============================================================\nCOMPANY KNOWLEDGE RULE\n============================================================\n\nThe company_text tool is the source of truth about Xexnaro.\n\nUse company_text to understand:\n\n- Xexnaro's services\n- Xexnaro's business\n- Xexnaro's capabilities\n- Xexnaro's locations\n- Xexnaro's positioning\n- Other verified company information\n\nNEVER invent company information.\n\nDo not invent:\n\n- Clients\n- Client names\n- Pricing\n- Discounts\n- Statistics\n- Revenue\n- Number of employees\n- Years of experience\n- Awards\n- Certifications\n- Partnerships\n- Guarantees\n- Results\n- Customer testimonials\n- Locations\n- Services\n\nunless explicitly supported by company_text.\n\n============================================================\nBRAND\n============================================================\n\nCompany name:\n\nXexnaro\n\nAlways write:\n\nXexnaro\n\nNever write:\n\nXEN HRA\nXenhra\nXEXNARO\nXenaro\n\nThe old XEN HRA company information must NOT appear in the generated post.\n\n============================================================\nTOPIC RULE\n============================================================\n\nThe topic returned by next_topic is authoritative.\n\nFor example:\n\nIf next_topic returns:\n\nLocal SEO\n\nthen the entire post must focus on Local SEO.\n\nThat means:\n\nTopic → Local SEO\nTitle → Local SEO\nSubtitle → Local SEO\nImage Prompt → Local SEO\nCaption → Local SEO\nHashtags → Local SEO\n\nIf next_topic returns:\n\nSEO\n\nthe post must focus on SEO.\n\nIf next_topic returns:\n\nGoogle Ads\n\nthe post must focus on Google Ads.\n\nIf next_topic returns:\n\nSocial Media Marketing\n\nthe post must focus on Social Media Marketing.\n\nNEVER mix unrelated topics.\n\n============================================================\nCONTENT QUALITY\n============================================================\n\nThe Facebook post must be:\n\n- Professional\n- Modern\n- Useful\n- Engaging\n- Natural\n- Business-oriented\n- Easy to understand\n- Suitable for Facebook\n\nAvoid:\n\n- Generic AI language\n- Excessive emojis\n- Clickbait\n- Keyword stuffing\n- Repetitive wording\n- Fake claims\n- Overly promotional language\n\nThe post should teach the audience something useful while naturally connecting the topic to Xexnaro.\n\n============================================================\nTITLE\n============================================================\n\nCreate a short attention-grabbing title.\n\nLength:\n\n4–10 words.\n\nThe title must directly relate to the selected topic.\n\nDo not use clickbait.\n\n============================================================\nSUBTITLE\n============================================================\n\nCreate a short supporting subtitle.\n\nLength:\n\n5–15 words.\n\nIt must reinforce the title and remain directly related to the selected topic.\n\n============================================================\nIMAGE PROMPT\n============================================================\n\nCreate ONE detailed prompt for an image generation system.\n\nDo NOT generate the image yourself.\n\nThe image prompt must:\n\n- Directly represent the selected topic\n- Look professional\n- Look modern\n- Be suitable for a Facebook business post\n- Have strong visual hierarchy\n- Include appropriate digital marketing/business elements\n- Leave suitable negative space for title/subtitle overlay\n- Avoid excessive text inside the image\n\nThe image must NOT contain:\n\n- Random unrelated objects\n- HR imagery\n- Recruitment imagery\n- Payroll imagery\n- Fake statistics\n- Fake dashboards with fake numbers\n- Fake customer testimonials\n- Unrelated company claims\n\n============================================================\nCAPTION\n============================================================\n\nWrite a Facebook caption between 120 and 180 words.\n\nUse this structure:\n\n1. Strong hook\n2. Problem / observation\n3. Useful explanation\n4. Practical insight\n5. Natural Xexnaro connection\n6. Call to action\n7. Exactly 8 hashtags\n\nThe caption must focus primarily on the selected topic.\n\nThe Xexnaro connection must only use information supported by company_text.\n\n============================================================\nHOOK\n============================================================\n\nStart with a strong, natural hook.\n\nAvoid using the same hook repeatedly.\n\nExamples:\n\n\"Being visible online is not the same as being discoverable by the right customers.\"\n\n\"Your website can be excellent and still remain invisible to the people searching for it.\"\n\n\"Getting clicks is easy. Getting meaningful business results requires strategy.\"\n\nThese are examples only. Create a fresh hook for every post.\n\n============================================================\nPRACTICAL VALUE\n============================================================\n\nThe reader should learn something useful.\n\nExplain:\n\n- Why the topic matters\n- A common mistake\n- A useful strategy\n- A practical action\n- A business benefit\n\nDo not make unsupported guarantees.\n\n============================================================\nXEXNARO CONNECTION\n============================================================\n\nMention Xexnaro naturally.\n\nExample:\n\n\"Businesses looking to strengthen their digital presence can work with Xexnaro to build a stronger strategy around their online goals.\"\n\nOnly use claims that are supported by company_text.\n\nDo not say Xexnaro provides a service unless company_text supports it.\n\n============================================================\nCALL TO ACTION\n============================================================\n\nEnd the caption with a natural CTA.\n\nExamples:\n\n\"Looking to strengthen your digital presence? Connect with Xexnaro.\"\n\n\"Ready to build a stronger online presence? Let's talk.\"\n\n\"Want to improve your digital visibility? Connect with Xexnaro.\"\n\nCreate a fresh CTA instead of repeating the same sentence every time.\n\n============================================================\nHASHTAGS\n============================================================\n\nGenerate EXACTLY 8 hashtags.\n\nEvery hashtag must be relevant to the selected topic.\n\nHashtags should be different according to the topic.\n\nExample for Local SEO:\n\n#LocalSEO\n#LocalSearch\n#GoogleBusinessProfile\n#LocalMarketing\n#DigitalMarketing\n#OnlineVisibility\n#Xexnaro\n#SearchOptimization\n\nExample for Google Ads:\n\n#GoogleAds\n#PPC\n#PaidSearch\n#DigitalAdvertising\n#LeadGeneration\n#DigitalMarketing\n#Xexnaro\n#OnlineGrowth\n\nDo NOT blindly reuse the same hashtags for every topic.\n\nDo NOT use old XEN HRA / HR hashtags.\n\n============================================================\nANTI-REPETITION\n============================================================\n\nEvery execution must create a fresh post.\n\nDo not copy previous:\n\n- Title\n- Subtitle\n- Caption\n- Hook\n- CTA\n- Image Prompt\n\nEven if the same topic eventually appears again, create a substantially different angle.\n\nVary:\n\n- Hook\n- Business problem\n- Example\n- Explanation\n- Title\n- Subtitle\n- Image concept\n- CTA\n\n============================================================\nIMPORTANT\n============================================================\n\nYou are ONLY responsible for creating content.\n\nYou MUST NOT:\n\n- Generate the actual image\n- Publish to Facebook\n- Call Facebook APIs\n- Send ntfy notifications\n- Call preview_post\n- Call publish_facebook\n\nAnother agent handles preview delivery.\n\n============================================================\nOUTPUT\n============================================================\n\nReturn STRICT VALID JSON ONLY.\n\nDo not use Markdown.\n\nDo not use code fences.\n\nDo not add explanations before or after the JSON.\n\nUse EXACTLY these keys:\n\n{\n  \"topic\": \"\",\n  \"imagePrompt\": \"\",\n  \"title\": \"\",\n  \"subtitle\": \"\",\n  \"caption\": \"\"\n}\n\nThe \"topic\" value MUST be the exact topic returned by next_topic.\n\nThe caption must contain exactly 8 hashtags at the end.\n\nReturn your final response as valid JSON only.\nDo not call any tool named \"json\".\n\nSTOP.\n\nDo not call any tool again.\nDo not generate another post.\nDo not start another execution.\nDo not repeat the workflow.\nReturn exactly one post.",
+          "messageHistory": "",
+          "conversationHistorySelection": "all_messages",
+          "humanMessagePrompt": "",
+          "tools": [
+            "{{requestsGet_0.data.instance}}",
+            "{{requestsGet_1.data.instance}}"
+          ],
+          "sequentialNode": [
+            "{{seqStart_0.data.instance}}"
+          ],
+          "model": "{{groqChat_0.data.instance}}",
+          "interrupt": "",
+          "promptValues": "",
+          "approvalPrompt": "You are about to execute tool: {tools}. Ask if user want to proceed",
+          "approveButtonText": "Yes",
+          "rejectButtonText": "No",
+          "updateStateMemory": "updateStateMemoryUI",
+          "maxIterations": ""
+        },
+        "outputAnchors": [
+          {
+            "id": "seqAgent_2-output-seqAgent-Agent",
+            "name": "seqAgent",
+            "label": "Agent",
+            "description": "Agent that can execute tools",
+            "type": "Agent"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 863,
+      "positionAbsolute": {
+        "x": -298.05028919904106,
+        "y": -66.87923573284138
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "seqStart_0",
+      "position": {
+        "x": -1696.907129395051,
+        "y": -328.21198278547695
+      },
+      "type": "customNode",
+      "data": {
+        "id": "seqStart_0",
+        "label": "Start",
+        "version": 2,
+        "name": "seqStart",
+        "type": "Start",
+        "baseClasses": [
+          "Start"
+        ],
+        "category": "Sequential Agents",
+        "description": "Starting point of the conversation",
+        "inputParams": [],
+        "inputAnchors": [
+          {
+            "label": "Chat Model",
+            "name": "model",
+            "type": "BaseChatModel",
+            "description": "Only compatible with models that are capable of function calling: ChatOpenAI, ChatMistral, ChatAnthropic, ChatGoogleGenerativeAI, ChatVertexAI, GroqChat",
+            "id": "seqStart_0-input-model-BaseChatModel",
+            "display": true
+          },
+          {
+            "label": "Agent Memory",
+            "name": "agentMemory",
+            "type": "BaseCheckpointSaver",
+            "description": "Save the state of the agent",
+            "optional": true,
+            "id": "seqStart_0-input-agentMemory-BaseCheckpointSaver",
+            "display": true
+          },
+          {
+            "label": "State",
+            "name": "state",
+            "type": "State",
+            "description": "State is an object that is updated by nodes in the graph, passing from one node to another. By default, state contains \"messages\" that got updated with each message sent and received.",
+            "optional": true,
+            "id": "seqStart_0-input-state-State",
+            "display": true
+          },
+          {
+            "label": "Input Moderation",
+            "description": "Detect text that could generate harmful output and prevent it from being sent to the language model",
+            "name": "inputModeration",
+            "type": "Moderation",
+            "optional": true,
+            "list": true,
+            "id": "seqStart_0-input-inputModeration-Moderation",
+            "display": true
+          }
+        ],
+        "inputs": {
+          "model": "{{groqChat_0.data.instance}}",
+          "agentMemory": "{{agentMemory_0.data.instance}}",
+          "state": "",
+          "inputModeration": ""
+        },
+        "outputAnchors": [
+          {
+            "id": "seqStart_0-output-seqStart-Start",
+            "name": "seqStart",
+            "label": "Start",
+            "description": "Starting point of the conversation",
+            "type": "Start"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 387,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -1696.907129395051,
+        "y": -328.21198278547695
+      },
+      "dragging": false
+    },
+    {
+      "id": "seqEnd_0",
+      "position": {
+        "x": 618.5777262778889,
+        "y": 46.28783124654046
+      },
+      "type": "customNode",
+      "data": {
+        "id": "seqEnd_0",
+        "label": "End",
+        "version": 2.1,
+        "name": "seqEnd",
+        "type": "End",
+        "hideOutput": true,
+        "baseClasses": [
+          "End"
+        ],
+        "category": "Sequential Agents",
+        "description": "End conversation",
+        "inputParams": [],
+        "inputAnchors": [
+          {
+            "label": "Sequential Node",
+            "name": "sequentialNode",
+            "type": "Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+            "description": "Can be connected to one of the following nodes: Agent, Condition, LLM Node, Tool Node, Custom Function, Execute Flow",
+            "id": "seqEnd_0-input-sequentialNode-Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+            "display": true
+          }
+        ],
+        "inputs": {
+          "sequentialNode": "{{seqAgent_3.data.instance}}"
+        },
+        "outputAnchors": [],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 148,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 618.5777262778889,
+        "y": 46.28783124654046
+      },
+      "dragging": false
+    },
+    {
+      "id": "groqChat_0",
+      "position": {
+        "x": -1055.3750537325955,
+        "y": 27.032079403129615
+      },
+      "type": "customNode",
+      "data": {
+        "id": "groqChat_0",
+        "label": "Groq",
+        "version": 4,
+        "name": "groqChat",
+        "type": "GroqChat",
+        "baseClasses": [
+          "GroqChat",
+          "BaseChatModel",
+          "BaseLanguageModel",
+          "Runnable"
+        ],
+        "category": "Chat Models",
+        "description": "Wrapper around Groq API with LPU Inference Engine",
+        "inputParams": [
+          {
+            "label": "Connect Credential",
+            "name": "credential",
+            "type": "credential",
+            "credentialNames": [
+              "groqApi"
+            ],
+            "optional": true,
+            "id": "groqChat_0-input-credential-credential",
+            "display": true
+          },
+          {
+            "label": "Model Name",
+            "name": "modelName",
+            "type": "asyncOptions",
+            "loadMethod": "listModels",
+            "placeholder": "llama3-70b-8192",
+            "id": "groqChat_0-input-modelName-asyncOptions",
+            "display": true
+          },
+          {
+            "label": "Temperature",
+            "name": "temperature",
+            "type": "number",
+            "step": 0.1,
+            "default": 0.9,
+            "optional": true,
+            "id": "groqChat_0-input-temperature-number",
+            "display": true
+          },
+          {
+            "label": "Max Tokens",
+            "name": "maxTokens",
+            "type": "number",
+            "step": 1,
+            "optional": true,
+            "additionalParams": true,
+            "id": "groqChat_0-input-maxTokens-number",
+            "display": true
+          },
+          {
+            "label": "Streaming",
+            "name": "streaming",
+            "type": "boolean",
+            "default": true,
+            "optional": true,
+            "id": "groqChat_0-input-streaming-boolean",
+            "display": true
+          }
+        ],
+        "inputAnchors": [
+          {
+            "label": "Cache",
+            "name": "cache",
+            "type": "BaseCache",
+            "optional": true,
+            "id": "groqChat_0-input-cache-BaseCache",
+            "display": true
+          }
+        ],
+        "inputs": {
+          "cache": "",
+          "modelName": "openai/gpt-oss-20b",
+          "temperature": "0.1",
+          "maxTokens": "",
+          "streaming": false
+        },
+        "outputAnchors": [
+          {
+            "id": "groqChat_0-output-groqChat-GroqChat|BaseChatModel|BaseLanguageModel|Runnable",
+            "name": "groqChat",
+            "label": "GroqChat",
+            "description": "Wrapper around Groq API with LPU Inference Engine",
+            "type": "GroqChat | BaseChatModel | BaseLanguageModel | Runnable"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 674,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -1055.3750537325955,
+        "y": 27.032079403129615
+      },
+      "dragging": false
+    },
+    {
+      "id": "requestsPost_0",
+      "position": {
+        "x": -1318.571045667365,
+        "y": -353.66396206139547
+      },
+      "type": "customNode",
+      "data": {
+        "id": "requestsPost_0",
+        "label": "Create Unique Preview",
+        "version": 2,
+        "name": "requestsPost",
+        "type": "RequestsPost",
+        "baseClasses": [
+          "RequestsPost",
+          "DynamicStructuredTool",
+          "StructuredTool",
+          "Runnable",
+          "Tool"
+        ],
+        "category": "Tools",
+        "description": "Execute HTTP POST requests",
+        "inputParams": [
+          {
+            "label": "URL",
+            "name": "requestsPostUrl",
+            "type": "string",
+            "acceptVariable": true,
+            "id": "requestsPost_0-input-requestsPostUrl-string",
+            "display": true
+          },
+          {
+            "label": "Name",
+            "name": "requestsPostName",
+            "type": "string",
+            "default": "requests_post",
+            "description": "Name of the tool",
+            "additionalParams": true,
+            "optional": true,
+            "id": "requestsPost_0-input-requestsPostName-string",
+            "display": true
+          },
+          {
+            "label": "Description",
+            "name": "requestsPostDescription",
+            "type": "string",
+            "rows": 4,
+            "default": "Use this when you want to execute a POST request to create or update a resource.",
+            "description": "Describe to LLM when it should use this tool",
+            "additionalParams": true,
+            "optional": true,
+            "id": "requestsPost_0-input-requestsPostDescription-string",
+            "display": true
+          },
+          {
+            "label": "Headers",
+            "name": "requestsPostHeaders",
+            "type": "string",
+            "rows": 4,
+            "acceptVariable": true,
+            "additionalParams": true,
+            "optional": true,
+            "placeholder": "{\n    \"Authorization\": \"Bearer <token>\"\n}",
+            "id": "requestsPost_0-input-requestsPostHeaders-string",
+            "display": true
+          },
+          {
+            "label": "Body",
+            "name": "requestPostBody",
+            "type": "string",
+            "rows": 4,
+            "description": "JSON body for the POST request. This will override the body generated by the LLM",
+            "additionalParams": true,
+            "acceptVariable": true,
+            "optional": true,
+            "placeholder": "{\n    \"name\": \"John Doe\",\n    \"age\": 30\n}",
+            "id": "requestsPost_0-input-requestPostBody-string",
+            "display": true
+          },
+          {
+            "label": "Body Schema",
+            "name": "requestsPostBodySchema",
+            "type": "code",
+            "description": "Description of the available body params to enable LLM to figure out which body params to use",
+            "placeholder": "{\n    \"name\": {\n        \"type\": \"string\",\n        \"required\": true,\n        \"description\": \"Name of the item\"\n    },\n    \"date\": {\n        \"type\": \"string\",\n        \"description\": \"Date of the item\"\n    }\n}",
+            "optional": true,
+            "hideCodeExecute": true,
+            "additionalParams": true,
+            "codeExample": "{\n    \"name\": {\n        \"type\": \"string\",\n        \"required\": true,\n        \"description\": \"Name of the item\"\n    },\n    \"date\": {\n        \"type\": \"string\",\n        \"description\": \"Date of the item\"\n    }\n}",
+            "id": "requestsPost_0-input-requestsPostBodySchema-code",
+            "display": true
+          },
+          {
+            "label": "Max Output Length",
+            "name": "requestsPostMaxOutputLength",
+            "type": "number",
+            "description": "Max length of the output. Remove this if you want to return the entire response",
+            "default": "2000",
+            "step": 1,
+            "optional": true,
+            "additionalParams": true,
+            "id": "requestsPost_0-input-requestsPostMaxOutputLength-number",
+            "display": true
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "requestsPostUrl": "http://127.0.0.1:8000/preview-post",
+          "requestsPostName": "preview_post",
+          "requestsPostDescription": "Create a unique pending Facebook post preview and send its ntfy review notification.\n\nThis tool accepts exactly one argument named body.\n\nInside body, provide prompt, title, subtitle and caption.\n\nNever provide prompt, title, subtitle or caption as top-level arguments.\n\nThe agent must use body.prompt, body.title, body.subtitle and body.caption.\n\nThis tool does not publish anything to Facebook.",
+          "requestsPostHeaders": "{\n  \"Content-Type\": \"application/json\"\n}",
+          "requestPostBody": "{\n  \"prompt\": \"{{body.prompt}}\",\n  \"title\": \"{{body.title}}\",\n  \"subtitle\": \"{{body.subtitle}}\",\n  \"caption\": \"{{body.caption}}\"\n}",
+          "requestsPostBodySchema": "{\n  \"prompt\": {\n    \"type\": \"string\",\n    \"required\": true,\n    \"description\": \"Detailed image-generation prompt\"\n  },\n  \"title\": {\n    \"type\": \"string\",\n    \"required\": true,\n    \"description\": \"Title displayed on the generated image\"\n  },\n  \"subtitle\": {\n    \"type\": \"string\",\n    \"required\": true,\n    \"description\": \"Subtitle displayed on the generated image\"\n  },\n  \"caption\": {\n    \"type\": \"string\",\n    \"required\": true,\n    \"description\": \"Complete Facebook post caption\"\n  }\n}",
+          "requestsPostMaxOutputLength": "2000"
+        },
+        "outputAnchors": [
+          {
+            "id": "requestsPost_0-output-requestsPost-RequestsPost|DynamicStructuredTool|StructuredTool|Runnable|Tool",
+            "name": "requestsPost",
+            "label": "RequestsPost",
+            "description": "Execute HTTP POST requests",
+            "type": "RequestsPost | DynamicStructuredTool | StructuredTool | Runnable | Tool"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 336,
+      "selected": false,
+      "dragging": false,
+      "positionAbsolute": {
+        "x": -1318.571045667365,
+        "y": -353.66396206139547
+      }
+    },
+    {
+      "id": "requestsGet_0",
+      "position": {
+        "x": -942.7603561573487,
+        "y": -446.73791573183723
+      },
+      "type": "customNode",
+      "data": {
+        "id": "requestsGet_0",
+        "label": "Requests Get",
+        "version": 2,
+        "name": "requestsGet",
+        "type": "RequestsGet",
+        "baseClasses": [
+          "RequestsGet",
+          "DynamicStructuredTool",
+          "StructuredTool",
+          "Runnable",
+          "Tool"
+        ],
+        "category": "Tools",
+        "description": "Execute HTTP GET requests",
+        "inputParams": [
+          {
+            "label": "URL",
+            "name": "requestsGetUrl",
+            "type": "string",
+            "acceptVariable": true,
+            "id": "requestsGet_0-input-requestsGetUrl-string",
+            "display": true
+          },
+          {
+            "label": "Name",
+            "name": "requestsGetName",
+            "type": "string",
+            "default": "requests_get",
+            "description": "Name of the tool",
+            "additionalParams": true,
+            "optional": true,
+            "id": "requestsGet_0-input-requestsGetName-string",
+            "display": true
+          },
+          {
+            "label": "Description",
+            "name": "requestsGetDescription",
+            "type": "string",
+            "rows": 4,
+            "default": "Use this when you need to execute a GET request to get data from a website.",
+            "description": "Describe to LLM when it should use this tool",
+            "additionalParams": true,
+            "optional": true,
+            "id": "requestsGet_0-input-requestsGetDescription-string",
+            "display": true
+          },
+          {
+            "label": "Headers",
+            "name": "requestsGetHeaders",
+            "type": "string",
+            "rows": 4,
+            "acceptVariable": true,
+            "additionalParams": true,
+            "optional": true,
+            "placeholder": "{\n    \"Authorization\": \"Bearer <token>\"\n}",
+            "id": "requestsGet_0-input-requestsGetHeaders-string",
+            "display": true
+          },
+          {
+            "label": "Query Params Schema",
+            "name": "requestsGetQueryParamsSchema",
+            "type": "code",
+            "description": "Description of the available query params to enable LLM to figure out which query params to use",
+            "placeholder": "{\n    \"id\": {\n        \"type\": \"string\",\n        \"required\": true,\n        \"in\": \"path\",\n        \"description\": \"ID of the item to get. /:id\"\n    },\n    \"limit\": {\n        \"type\": \"string\",\n        \"in\": \"query\",\n        \"description\": \"Limit the number of items to get. ?limit=10\"\n    }\n}",
+            "optional": true,
+            "hideCodeExecute": true,
+            "additionalParams": true,
+            "codeExample": "{\n    \"id\": {\n        \"type\": \"string\",\n        \"required\": true,\n        \"in\": \"path\",\n        \"description\": \"ID of the item to get. /:id\"\n    },\n    \"limit\": {\n        \"type\": \"string\",\n        \"in\": \"query\",\n        \"description\": \"Limit the number of items to get. ?limit=10\"\n    }\n}",
+            "id": "requestsGet_0-input-requestsGetQueryParamsSchema-code",
+            "display": true
+          },
+          {
+            "label": "Max Output Length",
+            "name": "requestsGetMaxOutputLength",
+            "type": "number",
+            "description": "Max length of the output. Remove this if you want to return the entire response",
+            "default": "2000",
+            "step": 1,
+            "optional": true,
+            "additionalParams": true,
+            "id": "requestsGet_0-input-requestsGetMaxOutputLength-number",
+            "display": true
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "requestsGetUrl": "http://127.0.0.1:8000/company-text",
+          "requestsGetName": "company_text",
+          "requestsGetDescription": "Retrieve the latest information about XEN HRA.\n\nAlways use this tool before generating any Facebook content.\n\nUse only the returned information.\n\nNever invent company details.",
+          "requestsGetHeaders": "",
+          "requestsGetQueryParamsSchema": "",
+          "requestsGetMaxOutputLength": "2000"
+        },
+        "outputAnchors": [
+          {
+            "id": "requestsGet_0-output-requestsGet-RequestsGet|DynamicStructuredTool|StructuredTool|Runnable|Tool",
+            "name": "requestsGet",
+            "label": "RequestsGet",
+            "description": "Execute HTTP GET requests",
+            "type": "RequestsGet | DynamicStructuredTool | StructuredTool | Runnable | Tool"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 336,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -942.7603561573487,
+        "y": -446.73791573183723
+      },
+      "dragging": false
+    },
+    {
+      "id": "requestsGet_1",
+      "position": {
+        "x": -494.6099217262905,
+        "y": -524.6906702747567
+      },
+      "type": "customNode",
+      "data": {
+        "id": "requestsGet_1",
+        "label": "Requests Get",
+        "version": 2,
+        "name": "requestsGet",
+        "type": "RequestsGet",
+        "baseClasses": [
+          "RequestsGet",
+          "DynamicStructuredTool",
+          "StructuredTool",
+          "Runnable",
+          "Tool"
+        ],
+        "category": "Tools",
+        "description": "Execute HTTP GET requests",
+        "inputParams": [
+          {
+            "label": "URL",
+            "name": "requestsGetUrl",
+            "type": "string",
+            "acceptVariable": true,
+            "id": "requestsGet_1-input-requestsGetUrl-string",
+            "display": true
+          },
+          {
+            "label": "Name",
+            "name": "requestsGetName",
+            "type": "string",
+            "default": "requests_get",
+            "description": "Name of the tool",
+            "additionalParams": true,
+            "optional": true,
+            "id": "requestsGet_1-input-requestsGetName-string",
+            "display": true
+          },
+          {
+            "label": "Description",
+            "name": "requestsGetDescription",
+            "type": "string",
+            "rows": 4,
+            "default": "Use this when you need to execute a GET request to get data from a website.",
+            "description": "Describe to LLM when it should use this tool",
+            "additionalParams": true,
+            "optional": true,
+            "id": "requestsGet_1-input-requestsGetDescription-string",
+            "display": true
+          },
+          {
+            "label": "Headers",
+            "name": "requestsGetHeaders",
+            "type": "string",
+            "rows": 4,
+            "acceptVariable": true,
+            "additionalParams": true,
+            "optional": true,
+            "placeholder": "{\n    \"Authorization\": \"Bearer <token>\"\n}",
+            "id": "requestsGet_1-input-requestsGetHeaders-string",
+            "display": true
+          },
+          {
+            "label": "Query Params Schema",
+            "name": "requestsGetQueryParamsSchema",
+            "type": "code",
+            "description": "Description of the available query params to enable LLM to figure out which query params to use",
+            "placeholder": "{\n    \"id\": {\n        \"type\": \"string\",\n        \"required\": true,\n        \"in\": \"path\",\n        \"description\": \"ID of the item to get. /:id\"\n    },\n    \"limit\": {\n        \"type\": \"string\",\n        \"in\": \"query\",\n        \"description\": \"Limit the number of items to get. ?limit=10\"\n    }\n}",
+            "optional": true,
+            "hideCodeExecute": true,
+            "additionalParams": true,
+            "codeExample": "{\n    \"id\": {\n        \"type\": \"string\",\n        \"required\": true,\n        \"in\": \"path\",\n        \"description\": \"ID of the item to get. /:id\"\n    },\n    \"limit\": {\n        \"type\": \"string\",\n        \"in\": \"query\",\n        \"description\": \"Limit the number of items to get. ?limit=10\"\n    }\n}",
+            "id": "requestsGet_1-input-requestsGetQueryParamsSchema-code",
+            "display": true
+          },
+          {
+            "label": "Max Output Length",
+            "name": "requestsGetMaxOutputLength",
+            "type": "number",
+            "description": "Max length of the output. Remove this if you want to return the entire response",
+            "default": "2000",
+            "step": 1,
+            "optional": true,
+            "additionalParams": true,
+            "id": "requestsGet_1-input-requestsGetMaxOutputLength-number",
+            "display": true
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "requestsGetUrl": "http://127.0.0.1:8000/next-topic",
+          "requestsGetName": "next_topic",
+          "requestsGetDescription": "Use this tool to get the next company topic.\n\nAlways use this tool after reading company_text.\n\nThis tool returns a different company topic every time.\n\nUse the returned topic to create today's Facebook post.\n\nDo not create your own topic.",
+          "requestsGetHeaders": "",
+          "requestsGetQueryParamsSchema": "",
+          "requestsGetMaxOutputLength": "2000"
+        },
+        "outputAnchors": [
+          {
+            "id": "requestsGet_1-output-requestsGet-RequestsGet|DynamicStructuredTool|StructuredTool|Runnable|Tool",
+            "name": "requestsGet",
+            "label": "RequestsGet",
+            "description": "Execute HTTP GET requests",
+            "type": "RequestsGet | DynamicStructuredTool | StructuredTool | Runnable | Tool"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 336,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -494.6099217262905,
+        "y": -524.6906702747567
+      },
+      "dragging": false
+    },
+    {
+      "id": "seqAgent_3",
+      "position": {
+        "x": 158.51627580497433,
+        "y": -152.86528931038976
+      },
+      "type": "customNode",
+      "data": {
+        "id": "seqAgent_3",
+        "label": "Preview Delivery Agent",
+        "version": 4.1,
+        "name": "seqAgent",
+        "type": "Agent",
+        "baseClasses": [
+          "Agent"
+        ],
+        "category": "Sequential Agents",
+        "description": "Agent that can execute tools",
+        "inputParams": [
+          {
+            "label": "Agent Name",
+            "name": "agentName",
+            "type": "string",
+            "placeholder": "Agent",
+            "id": "seqAgent_3-input-agentName-string",
+            "display": true
+          },
+          {
+            "label": "System Prompt",
+            "name": "systemMessagePrompt",
+            "type": "string",
+            "rows": 4,
+            "optional": true,
+            "default": "You are a research assistant who can search for up-to-date info using search engine.",
+            "id": "seqAgent_3-input-systemMessagePrompt-string",
+            "display": true
+          },
+          {
+            "label": "Prepend Messages History",
+            "name": "messageHistory",
+            "description": "Prepend a list of messages between System Prompt and Human Prompt. This is useful when you want to provide few shot examples",
+            "type": "code",
+            "hideCodeExecute": true,
+            "codeExample": "const { AIMessage, HumanMessage, ToolMessage } = require('@langchain/core/messages');\n\nreturn [\n    new HumanMessage(\"What is 333382 🦜 1932?\"),\n    new AIMessage({\n        content: \"\",\n        tool_calls: [\n        {\n            id: \"12345\",\n            name: \"calulator\",\n            args: {\n                number1: 333382,\n                number2: 1932,\n                operation: \"divide\",\n            },\n        },\n        ],\n    }),\n    new ToolMessage({\n        tool_call_id: \"12345\",\n        content: \"The answer is 172.558.\",\n    }),\n    new AIMessage(\"The answer is 172.558.\"),\n]",
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_3-input-messageHistory-code",
+            "display": true
+          },
+          {
+            "label": "Conversation History",
+            "name": "conversationHistorySelection",
+            "type": "options",
+            "options": [
+              {
+                "label": "User Question",
+                "name": "user_question",
+                "description": "Use the user question from the historical conversation messages as input."
+              },
+              {
+                "label": "Last Conversation Message",
+                "name": "last_message",
+                "description": "Use the last conversation message from the historical conversation messages as input."
+              },
+              {
+                "label": "All Conversation Messages",
+                "name": "all_messages",
+                "description": "Use all conversation messages from the historical conversation messages as input."
+              },
+              {
+                "label": "Empty",
+                "name": "empty",
+                "description": "Do not use any messages from the conversation history. Ensure to use either System Prompt, Human Prompt, or Messages History."
+              }
+            ],
+            "default": "all_messages",
+            "optional": true,
+            "description": "Select which messages from the conversation history to include in the prompt. The selected messages will be inserted between the System Prompt (if defined) and [Messages History, Human Prompt].",
+            "additionalParams": true,
+            "id": "seqAgent_3-input-conversationHistorySelection-options",
+            "display": true
+          },
+          {
+            "label": "Human Prompt",
+            "name": "humanMessagePrompt",
+            "type": "string",
+            "description": "This prompt will be added at the end of the messages as human message",
+            "rows": 4,
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_3-input-humanMessagePrompt-string",
+            "display": true
+          },
+          {
+            "label": "Require Approval",
+            "name": "interrupt",
+            "description": "Pause execution and request user approval before running tools.\nIf enabled, the agent will prompt the user with customizable approve/reject options\nand will proceed only after approval. This requires a configured agent memory to manage\nthe state and handle approval requests.\nIf no tools are invoked, the agent proceeds without interruption.",
+            "type": "boolean",
+            "optional": true,
+            "id": "seqAgent_3-input-interrupt-boolean",
+            "display": true
+          },
+          {
+            "label": "Format Prompt Values",
+            "name": "promptValues",
+            "description": "Assign values to the prompt variables. You can also use $flow.state.<variable-name> to get the state value",
+            "type": "json",
+            "optional": true,
+            "acceptVariable": true,
+            "list": true,
+            "id": "seqAgent_3-input-promptValues-json",
+            "display": true
+          },
+          {
+            "label": "Approval Prompt",
+            "name": "approvalPrompt",
+            "description": "Prompt for approval. Only applicable if \"Require Approval\" is enabled",
+            "type": "string",
+            "default": "You are about to execute tool: {tools}. Ask if user want to proceed",
+            "rows": 4,
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_3-input-approvalPrompt-string",
+            "display": true
+          },
+          {
+            "label": "Approve Button Text",
+            "name": "approveButtonText",
+            "description": "Text for approve button. Only applicable if \"Require Approval\" is enabled",
+            "type": "string",
+            "default": "Yes",
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_3-input-approveButtonText-string",
+            "display": true
+          },
+          {
+            "label": "Reject Button Text",
+            "name": "rejectButtonText",
+            "description": "Text for reject button. Only applicable if \"Require Approval\" is enabled",
+            "type": "string",
+            "default": "No",
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_3-input-rejectButtonText-string",
+            "display": true
+          },
+          {
+            "label": "Update State",
+            "name": "updateStateMemory",
+            "type": "tabs",
+            "tabIdentifier": "selectedUpdateStateMemoryTab",
+            "additionalParams": true,
+            "default": "updateStateMemoryUI",
+            "tabs": [
+              {
+                "label": "Update State (Table)",
+                "name": "updateStateMemoryUI",
+                "type": "datagrid",
+                "hint": {
+                  "label": "How to use",
+                  "value": "\n1. Key and value pair to be updated. For example: if you have the following State:\n    | Key       | Operation     | Default Value     |\n    |-----------|---------------|-------------------|\n    | user      | Replace       |                   |\n\n    You can update the \"user\" value with the following:\n    | Key       | Value     |\n    |-----------|-----------|\n    | user      | john doe  |\n\n2. If you want to use the Agent's output as the value to update state, it is available as available as `$flow.output` with the following structure:\n    ```json\n    {\n        \"content\": \"Hello! How can I assist you today?\",\n        \"usedTools\": [\n            {\n                \"tool\": \"tool-name\",\n                \"toolInput\": \"{foo: var}\",\n                \"toolOutput\": \"This is the tool's output\"\n            }\n        ],\n        \"sourceDocuments\": [\n            {\n                \"pageContent\": \"This is the page content\",\n                \"metadata\": \"{foo: var}\"\n            }\n        ]\n    }\n    ```\n\n    For example, if the `toolOutput` is the value you want to update the state with, you can do the following:\n    | Key       | Value                                     |\n    |-----------|-------------------------------------------|\n    | user      | `$flow.output.usedTools[0].toolOutput`  |\n\n3. You can get default flow config, including the current \"state\":\n    - `$flow.sessionId`\n    - `$flow.chatId`\n    - `$flow.chatflowId`\n    - `$flow.input`\n    - `$flow.state`\n\n4. You can get custom variables: `$vars.<variable-name>`\n\n"
+                },
+                "description": "This is only applicable when you have a custom State at the START node. After agent execution, you might want to update the State values",
+                "datagrid": [
+                  {
+                    "field": "key",
+                    "headerName": "Key",
+                    "type": "asyncSingleSelect",
+                    "loadMethod": "loadStateKeys",
+                    "flex": 0.5,
+                    "editable": true
+                  },
+                  {
+                    "field": "value",
+                    "headerName": "Value",
+                    "type": "freeSolo",
+                    "valueOptions": [
+                      {
+                        "label": "Agent Output (string)",
+                        "value": "$flow.output.content"
+                      },
+                      {
+                        "label": "Used Tools (array)",
+                        "value": "$flow.output.usedTools"
+                      },
+                      {
+                        "label": "First Tool Output (string)",
+                        "value": "$flow.output.usedTools[0].toolOutput"
+                      },
+                      {
+                        "label": "Source Documents (array)",
+                        "value": "$flow.output.sourceDocuments"
+                      },
+                      {
+                        "label": "Global variable (string)",
+                        "value": "$vars.<variable-name>"
+                      },
+                      {
+                        "label": "Input Question (string)",
+                        "value": "$flow.input"
+                      },
+                      {
+                        "label": "Session Id (string)",
+                        "value": "$flow.sessionId"
+                      },
+                      {
+                        "label": "Chat Id (string)",
+                        "value": "$flow.chatId"
+                      },
+                      {
+                        "label": "Chatflow Id (string)",
+                        "value": "$flow.chatflowId"
+                      }
+                    ],
+                    "editable": true,
+                    "flex": 1
+                  }
+                ],
+                "optional": true,
+                "additionalParams": true
+              },
+              {
+                "label": "Update State (Code)",
+                "name": "updateStateMemoryCode",
+                "type": "code",
+                "hint": {
+                  "label": "How to use",
+                  "value": "\n1. Return the key value JSON object. For example: if you have the following State:\n    ```json\n    {\n        \"user\": null\n    }\n    ```\n\n    You can update the \"user\" value by returning the following:\n    ```js\n    return {\n        \"user\": \"john doe\"\n    }\n    ```\n\n2. If you want to use the agent's output as the value to update state, it is available as `$flow.output` with the following structure:\n    ```json\n    {\n        \"content\": \"Hello! How can I assist you today?\",\n        \"usedTools\": [\n            {\n                \"tool\": \"tool-name\",\n                \"toolInput\": \"{foo: var}\",\n                \"toolOutput\": \"This is the tool's output\"\n            }\n        ],\n        \"sourceDocuments\": [\n            {\n                \"pageContent\": \"This is the page content\",\n                \"metadata\": \"{foo: var}\"\n            }\n        ]\n    }\n    ```\n\n    For example, if the `toolOutput` is the value you want to update the state with, you can return the following:\n    ```js\n    return {\n        \"user\": $flow.output.usedTools[0].toolOutput\n    }\n    ```\n\n3. You can also get default flow config, including the current \"state\":\n    - `$flow.sessionId`\n    - `$flow.chatId`\n    - `$flow.chatflowId`\n    - `$flow.input`\n    - `$flow.state`\n\n4. You can get custom variables: `$vars.<variable-name>`\n\n"
+                },
+                "description": "This is only applicable when you have a custom State at the START node. After agent execution, you might want to update the State values. Must return an object representing the state",
+                "hideCodeExecute": true,
+                "codeExample": "const result = $flow.output;\n\n/* Suppose we have a custom State schema like this:\n* {\n    aggregate: {\n        value: (x, y) => x.concat(y),\n        default: () => []\n    }\n  }\n*/\n\nreturn {\n  aggregate: [result.content]\n};",
+                "optional": true,
+                "additionalParams": true
+              }
+            ],
+            "id": "seqAgent_3-input-updateStateMemory-tabs",
+            "display": true
+          },
+          {
+            "label": "Max Iterations",
+            "name": "maxIterations",
+            "type": "number",
+            "optional": true,
+            "additionalParams": true,
+            "id": "seqAgent_3-input-maxIterations-number",
+            "display": true
+          }
+        ],
+        "inputAnchors": [
+          {
+            "label": "Tools",
+            "name": "tools",
+            "type": "Tool",
+            "list": true,
+            "optional": true,
+            "id": "seqAgent_3-input-tools-Tool",
+            "display": true
+          },
+          {
+            "label": "Sequential Node",
+            "name": "sequentialNode",
+            "type": "Start | Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+            "description": "Can be connected to one of the following nodes: Start, Agent, Condition, LLM Node, Tool Node, Custom Function, Execute Flow",
+            "list": true,
+            "id": "seqAgent_3-input-sequentialNode-Start | Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+            "display": true
+          },
+          {
+            "label": "Chat Model",
+            "name": "model",
+            "type": "BaseChatModel",
+            "optional": true,
+            "description": "Overwrite model to be used for this agent",
+            "id": "seqAgent_3-input-model-BaseChatModel",
+            "display": true
+          }
+        ],
+        "inputs": {
+          "agentName": "PreviewDeliveryAgent",
+          "systemMessagePrompt": "You are XEXNARO's Preview Delivery Agent.\n\nThe Content Creator has already produced these fields:\n\nImage Prompt\nTitle\nSubtitle\nCaption\n\nYou have exactly one tool named preview_post.\n\nYou MUST call preview_post exactly once.\n\nIMPORTANT TOOL FORMAT\n\nThe preview_post tool accepts exactly one top-level property named body.\n\nThe prompt, title, subtitle and caption must be placed inside body.\n\nNever send prompt, title, subtitle or caption as top-level properties.\n\nUse this exact tool-call structure:\n\npreview_post({{\"body\":{{\"prompt\":\"image prompt value\",\"title\":\"title value\",\"subtitle\":\"subtitle value\",\"caption\":\"caption value\"}}}})\n\nThe doubled braces in this system prompt are intentional. Do not change them to single braces.\n\nWORKFLOW\n\n1. Read the Content Creator output.\n2. Extract Image Prompt.\n3. Extract Title.\n4. Extract Subtitle.\n5. Extract Caption.\n6. Call preview_post exactly once.\n7. Place all four extracted values inside the body property.\n8. Map Image Prompt to body.prompt.\n9. Map Title to body.title.\n10. Map Subtitle to body.subtitle.\n11. Map Caption to body.caption.\n12. Do not publish anything to Facebook.\n13. Do not ask for approval in Flowise.\n14. Human review and publishing happen through the ntfy review page.\n15. Never claim success unless preview_post returns status success.\n16. Your final answer must include the exact draft_id, preview_image_url and review_url returned by preview_post.\n\nIf the tool fails, return:\n\nPreview creation failed. No ntfy notification was sent.",
+          "messageHistory": "",
+          "conversationHistorySelection": "all_messages",
+          "humanMessagePrompt": "",
+          "tools": [
+            "{{requestsPost_0.data.instance}}"
+          ],
+          "sequentialNode": [
+            "{{seqAgent_2.data.instance}}"
+          ],
+          "model": "{{groqChat_0.data.instance}}",
+          "interrupt": false,
+          "promptValues": "",
+          "approvalPrompt": "",
+          "approveButtonText": "",
+          "rejectButtonText": "",
+          "updateStateMemory": "updateStateMemoryUI",
+          "maxIterations": ""
+        },
+        "outputAnchors": [
+          {
+            "id": "seqAgent_3-output-seqAgent-Agent",
+            "name": "seqAgent",
+            "label": "Agent",
+            "description": "Agent that can execute tools",
+            "type": "Agent"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 863,
+      "positionAbsolute": {
+        "x": 158.51627580497433,
+        "y": -152.86528931038976
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "agentMemory_0",
+      "position": {
+        "x": -2279.7180776514488,
+        "y": -340.1919257258221
+      },
+      "type": "customNode",
+      "data": {
+        "id": "agentMemory_0",
+        "label": "Agent Memory",
+        "version": 2,
+        "name": "agentMemory",
+        "type": "AgentMemory",
+        "baseClasses": [
+          "AgentMemory",
+          "BaseCheckpointSaver"
+        ],
+        "category": "Memory",
+        "description": "Memory for agentflow to remember the state of the conversation",
+        "inputParams": [
+          {
+            "label": "Connect Credential",
+            "name": "credential",
+            "type": "credential",
+            "credentialNames": [
+              "PostgresApi",
+              "MySQLApi"
+            ],
+            "optional": true,
+            "id": "agentMemory_0-input-credential-credential",
+            "display": true
+          },
+          {
+            "label": "Database",
+            "name": "databaseType",
+            "type": "options",
+            "options": [
+              {
+                "label": "SQLite",
+                "name": "sqlite"
+              },
+              {
+                "label": "PostgreSQL",
+                "name": "postgres"
+              },
+              {
+                "label": "MySQL",
+                "name": "mysql"
+              }
+            ],
+            "default": "sqlite",
+            "id": "agentMemory_0-input-databaseType-options",
+            "display": true
+          },
+          {
+            "label": "Database File Path",
+            "name": "databaseFilePath",
+            "type": "string",
+            "placeholder": "C:\\Users\\User\\.flowise\\database.sqlite",
+            "description": "If SQLite is selected, provide the path to the SQLite database file. Leave empty to use default application database",
+            "additionalParams": true,
+            "optional": true,
+            "id": "agentMemory_0-input-databaseFilePath-string",
+            "display": true
+          },
+          {
+            "label": "Host",
+            "name": "host",
+            "type": "string",
+            "description": "If PostgresQL/MySQL is selected, provide the host of the database",
+            "additionalParams": true,
+            "optional": true,
+            "id": "agentMemory_0-input-host-string",
+            "display": true
+          },
+          {
+            "label": "Database",
+            "name": "database",
+            "type": "string",
+            "description": "If PostgresQL/MySQL is selected, provide the name of the database",
+            "additionalParams": true,
+            "optional": true,
+            "id": "agentMemory_0-input-database-string",
+            "display": true
+          },
+          {
+            "label": "Port",
+            "name": "port",
+            "type": "number",
+            "description": "If PostgresQL/MySQL is selected, provide the port of the database",
+            "additionalParams": true,
+            "optional": true,
+            "id": "agentMemory_0-input-port-number",
+            "display": true
+          },
+          {
+            "label": "Additional Connection Configuration",
+            "name": "additionalConfig",
+            "type": "json",
+            "description": "Optional TypeORM connection options (e.g. ssl, connectTimeout). entities, subscribers, migrations, and extra are not allowed.",
+            "additionalParams": true,
+            "optional": true,
+            "id": "agentMemory_0-input-additionalConfig-json",
+            "display": true
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "databaseType": "sqlite",
+          "databaseFilePath": "",
+          "host": "",
+          "database": "",
+          "port": "",
+          "additionalConfig": ""
+        },
+        "outputAnchors": [
+          {
+            "id": "agentMemory_0-output-agentMemory-AgentMemory|BaseCheckpointSaver",
+            "name": "agentMemory",
+            "label": "AgentMemory",
+            "description": "Memory for agentflow to remember the state of the conversation",
+            "type": "AgentMemory | BaseCheckpointSaver"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 300,
+      "height": 427,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -2279.7180776514488,
+        "y": -340.1919257258221
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "groqChat_0",
+      "sourceHandle": "groqChat_0-output-groqChat-GroqChat|BaseChatModel|BaseLanguageModel|Runnable",
+      "target": "seqAgent_2",
+      "targetHandle": "seqAgent_2-input-model-BaseChatModel",
+      "type": "buttonedge",
+      "id": "groqChat_0-groqChat_0-output-groqChat-GroqChat|BaseChatModel|BaseLanguageModel|Runnable-seqAgent_2-seqAgent_2-input-model-BaseChatModel"
+    },
+    {
+      "source": "seqStart_0",
+      "sourceHandle": "seqStart_0-output-seqStart-Start",
+      "target": "seqAgent_2",
+      "targetHandle": "seqAgent_2-input-sequentialNode-Start | Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+      "type": "buttonedge",
+      "id": "seqStart_0-seqStart_0-output-seqStart-Start-seqAgent_2-seqAgent_2-input-sequentialNode-Start | Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow"
+    },
+    {
+      "source": "requestsGet_0",
+      "sourceHandle": "requestsGet_0-output-requestsGet-RequestsGet|DynamicStructuredTool|StructuredTool|Runnable|Tool",
+      "target": "seqAgent_2",
+      "targetHandle": "seqAgent_2-input-tools-Tool",
+      "type": "buttonedge",
+      "id": "requestsGet_0-requestsGet_0-output-requestsGet-RequestsGet|DynamicStructuredTool|StructuredTool|Runnable|Tool-seqAgent_2-seqAgent_2-input-tools-Tool"
+    },
+    {
+      "source": "requestsGet_1",
+      "sourceHandle": "requestsGet_1-output-requestsGet-RequestsGet|DynamicStructuredTool|StructuredTool|Runnable|Tool",
+      "target": "seqAgent_2",
+      "targetHandle": "seqAgent_2-input-tools-Tool",
+      "type": "buttonedge",
+      "id": "requestsGet_1-requestsGet_1-output-requestsGet-RequestsGet|DynamicStructuredTool|StructuredTool|Runnable|Tool-seqAgent_2-seqAgent_2-input-tools-Tool"
+    },
+    {
+      "source": "seqAgent_3",
+      "sourceHandle": "seqAgent_3-output-seqAgent-Agent",
+      "target": "seqEnd_0",
+      "targetHandle": "seqEnd_0-input-sequentialNode-Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+      "type": "buttonedge",
+      "id": "seqAgent_3-seqAgent_3-output-seqAgent-Agent-seqEnd_0-seqEnd_0-input-sequentialNode-Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow"
+    },
+    {
+      "source": "seqAgent_2",
+      "sourceHandle": "seqAgent_2-output-seqAgent-Agent",
+      "target": "seqAgent_3",
+      "targetHandle": "seqAgent_3-input-sequentialNode-Start | Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow",
+      "type": "buttonedge",
+      "id": "seqAgent_2-seqAgent_2-output-seqAgent-Agent-seqAgent_3-seqAgent_3-input-sequentialNode-Start | Agent | Condition | LLMNode | ToolNode | CustomFunction | ExecuteFlow"
+    },
+    {
+      "source": "groqChat_0",
+      "sourceHandle": "groqChat_0-output-groqChat-GroqChat|BaseChatModel|BaseLanguageModel|Runnable",
+      "target": "seqAgent_3",
+      "targetHandle": "seqAgent_3-input-model-BaseChatModel",
+      "type": "buttonedge",
+      "id": "groqChat_0-groqChat_0-output-groqChat-GroqChat|BaseChatModel|BaseLanguageModel|Runnable-seqAgent_3-seqAgent_3-input-model-BaseChatModel"
+    },
+    {
+      "source": "requestsPost_0",
+      "sourceHandle": "requestsPost_0-output-requestsPost-RequestsPost|DynamicStructuredTool|StructuredTool|Runnable|Tool",
+      "target": "seqAgent_3",
+      "targetHandle": "seqAgent_3-input-tools-Tool",
+      "type": "buttonedge",
+      "id": "requestsPost_0-requestsPost_0-output-requestsPost-RequestsPost|DynamicStructuredTool|StructuredTool|Runnable|Tool-seqAgent_3-seqAgent_3-input-tools-Tool"
+    },
+    {
+      "source": "agentMemory_0",
+      "sourceHandle": "agentMemory_0-output-agentMemory-AgentMemory|BaseCheckpointSaver",
+      "target": "seqStart_0",
+      "targetHandle": "seqStart_0-input-agentMemory-BaseCheckpointSaver",
+      "type": "buttonedge",
+      "id": "agentMemory_0-agentMemory_0-output-agentMemory-AgentMemory|BaseCheckpointSaver-seqStart_0-seqStart_0-input-agentMemory-BaseCheckpointSaver"
+    },
+    {
+      "source": "groqChat_0",
+      "sourceHandle": "groqChat_0-output-groqChat-GroqChat|BaseChatModel|BaseLanguageModel|Runnable",
+      "target": "seqStart_0",
+      "targetHandle": "seqStart_0-input-model-BaseChatModel",
+      "type": "buttonedge",
+      "id": "groqChat_0-groqChat_0-output-groqChat-GroqChat|BaseChatModel|BaseLanguageModel|Runnable-seqStart_0-seqStart_0-input-model-BaseChatModel"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+@"
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+node_modules/
+
+# Generated images
+output/*.jpg
+output/*.jpeg
+output/*.png
+
+# Local database
+*.db
+"@ | Set-Content .gitignore
