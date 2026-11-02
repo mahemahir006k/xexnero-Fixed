@@ -336,7 +336,7 @@ Please consider giving it a ⭐ on GitHub.
 
 # 👩‍💻 Author
 
-**Mahendran B|| Aravinthkumar K**
+**Mahendran B|| Aravinthkumar K || Yuvaraj S**
 
 Technical Architect | AI Enthusiast | Java | Spring Boot | Azure | Flowise | Generative AI
 
