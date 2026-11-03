@@ -6,6 +6,18 @@
 !.env.example
 
 # ==========================================
+# API KEYS & CREDENTIAL FILES
+# ==========================================
+*.key
+*.pem
+*.crt
+apikey.txt
+credentials.json
+service-account.json
+secrets.json
+auth.json
+
+# ==========================================
 # CONFIGURATION & SECRETS OVERRIDES
 # ==========================================
 config.yml
@@ -34,14 +46,3 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
-*.swo
-
-# ==========================================
-# BUILD & RUNTIME ARTIFACTS
-# ==========================================
-dist/
-build/
-node_modules/
-__pycache__/
-*.py[cod]
-*$py.class
